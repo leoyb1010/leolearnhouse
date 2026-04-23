@@ -1,142 +1,146 @@
-<p align="center">
-  <a href="https://learnhouse.app">
-    <img src=".github/images/learnhouse-github.png" alt="LearnHouse" width="600" />
-  </a>
-</p>
+# LeoLearnHouse
 
-<h3 align="center">The next-gen open-source platform for world-class educational content.</h3>
+一个基于 [learnhouse/learnhouse](https://github.com/learnhouse/learnhouse) 进行拆解、研究和二次产品化的学习平台项目。
 
-<p align="center">
-  <a href="https://github.com/learnhouse/learnhouse/blob/main/LICENSE"><img src="https://img.shields.io/github/license/learnhouse/learnhouse?style=flat&color=blue" alt="License" /></a>
-  <a href="https://github.com/learnhouse/learnhouse/stargazers"><img src="https://img.shields.io/github/stars/learnhouse/learnhouse?style=flat" alt="Stars" /></a>
-  <a href="https://www.npmjs.com/package/learnhouse"><img src="https://img.shields.io/npm/v/learnhouse?style=flat&label=cli" alt="CLI Version" /></a>
-  <a href="https://app.codecov.io/gh/learnhouse/learnhouse"><img src="https://img.shields.io/codecov/c/github/learnhouse/learnhouse?flag=api&label=api%20coverage" alt="API Coverage" /></a>
-  <a href="https://github.com/learnhouse/learnhouse/commits"><img src="https://img.shields.io/github/last-commit/learnhouse/learnhouse?style=flat&label=last%20commit" alt="Last Commit" /></a>
-  <a href="https://github.com/learnhouse/learnhouse/issues"><img src="https://img.shields.io/github/issues/learnhouse/learnhouse?style=flat" alt="Issues" /></a>
-  <a href="https://github.com/learnhouse/learnhouse/pulls"><img src="https://img.shields.io/github/issues-pr/learnhouse/learnhouse?style=flat&label=PRs" alt="Pull Requests" /></a>
-</p>
+这个仓库当前的目标不是原样维护上游全部能力，而是把上游项目里真正有价值的部分拆出来，分三阶段做成一套更轻、更容易落地、也更适合个人团队持续迭代的产品。
 
-<p align="center">
-📖 <b>Courses</b> — Create and manage courses with ease<br>
-✏️ <b>Editor</b> — Powerful block-based Notion-like content editor<br>
-📦 <b>Collections</b> — Organize courses into curated bundles<br>
-📝 <b>Assignments</b> — Create tasks and track student submissions<br>
-💬 <b>Discussions</b> — Community forums for your learners<br>
-🎙️ <b>Podcasts</b> — Audio content for on-the-go learning<br>
-📊 <b>Analytics</b> — Track engagement and course performance<br>
-🧊 <b>Playgrounds</b> — AI-generated interactive elements, simulations & diagrams<br>
-💻 <b>Code</b> — Real code execution with auto-grading in 30+ languages<br>
-📋 <b>Boards</b> — Real-time collaborative whiteboards<br>
-🧠 <b>AI</b> — Context-aware AI for learning & teaching<br>
-🎓 <b>Certificates</b> — Auto-generate certificates on course completion<br>
-👥 <b>User Groups</b> — Organize learners and control access<br>
-🔍 <b>SEO</b> — Built-in SEO optimization with metadata, sitemaps & open graph<br>
-🎨 <b>Customization</b> — Custom branding, landing pages & theming<br>
-💳 <b>Payments (Enterprise)</b> — Sell courses with no fees and no lock-in<br>
-🔐 <b>SSO (Enterprise)</b> — Single sign-on with OAuth providers<br>
-🏢 <b>Multi-Org (Enterprise)</b> — Run multiple organizations from a single instance<br>
-</p>
+## 仓库定位
 
-## 🚀 Get Started
+- 这是一个基于上游代码的二次开发仓库，不是 LearnHouse 官方仓库
+- 当前重点是理解架构、裁剪功能、验证本地可运行性，再逐步做自己的版本
+- 我们优先保留真正决定产品闭环的能力：账号体系、课程内容、学习流程、后台管理
+- 我们会延后高复杂模块：AI、白板、实时协作、播客、支付、SSO、多组织、企业版能力
 
-LearnHouse has an official CLI that handles everything — self-hosting, updates, backups, and local development.
+详细路线见：
 
-### Self-host
+- [三阶段拆解方案](docs/plans/2026-04-23-leolearnhouse-three-phase-plan.md)
 
-```bash
-npx learnhouse@latest setup
-```
+## 我对原项目的理解
 
-The setup wizard walks you through domain, database, admin account, and optional features. Once done, it generates all config files and starts your instance.
+LearnHouse 不是一个普通 LMS 页面项目，它更像一个“教育平台底座”，主要由四部分组成：
 
-```bash
-npx learnhouse start       # Start services
-npx learnhouse stop        # Stop services
-npx learnhouse update      # Update to latest version
-npx learnhouse logs        # Stream logs
-npx learnhouse backup      # Backup database
-npx learnhouse doctor      # Diagnose issues
-```
+| 模块 | 路径 | 作用 | 复杂度判断 |
+| --- | --- | --- | --- |
+| Web | `apps/web` | 前端站点、后台、编辑器、学习页、支付页等 | 很高 |
+| API | `apps/api` | 用户、课程、组织、权限、搜索、AI、分析等后端能力 | 很高 |
+| Collab | `apps/collab` | 实时协作文档与白板同步 | 中高 |
+| CLI | `apps/cli` | 本地开发、自托管、部署、运维入口 | 中 |
 
-### Development
+这个项目“臃肿”的原因，不是代码写得差，而是它一次性覆盖了太多产品层和平台层能力：
 
-```bash
-git clone https://github.com/learnhouse/learnhouse.git
-cd learnhouse
-npx learnhouse dev
-```
+- 既做课程平台，又做内容编辑器
+- 既做学习系统，又做实时协作
+- 既做业务产品，又做部署运维 CLI
+- 开源版本之外，还有 `ee/` 企业能力
+- 后端已经接入 AI、分析、支付、邮件、对象存储等外部依赖
 
-This spins up PostgreSQL and Redis, installs dependencies, and starts the API, Web, and Collab servers with hot reload.
+所以如果我们直接照着全量做，风险不是“做不出来”，而是“做得太慢、维护不起、上线周期过长”。
 
-> See the full [CLI documentation](apps/cli/README.md) for all commands and options.
+## 三阶段路线
 
-## 🛠️ Tech Stack
+### 第一阶段：最小可用学习平台
 
-<p align="center">
-<a href="https://nextjs.org"><img src="https://img.shields.io/badge/Next.js-000?style=flat&logo=nextdotjs&logoColor=white" alt="Next.js" /></a>
-<a href="https://react.dev"><img src="https://img.shields.io/badge/React-61DAFB?style=flat&logo=react&logoColor=black" alt="React" /></a>
-<a href="https://www.typescriptlang.org"><img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white" alt="TypeScript" /></a>
-<a href="https://tailwindcss.com"><img src="https://img.shields.io/badge/TailwindCSS-06B6D4?style=flat&logo=tailwindcss&logoColor=white" alt="TailwindCSS" /></a>
-<a href="https://www.radix-ui.com"><img src="https://img.shields.io/badge/Radix_UI-161618?style=flat&logo=radixui&logoColor=white" alt="Radix UI" /></a>
-<a href="https://tiptap.dev"><img src="https://img.shields.io/badge/Tiptap-1a1a2e?style=flat&logoColor=white" alt="Tiptap" /></a>
-<a href="https://codemirror.net"><img src="https://img.shields.io/badge/CodeMirror-D30707?style=flat&logo=codemirror&logoColor=white" alt="CodeMirror" /></a>
-<a href="https://yjs.dev"><img src="https://img.shields.io/badge/Yjs-6EEB83?style=flat&logoColor=black" alt="Yjs" /></a>
-<a href="https://fastapi.tiangolo.com"><img src="https://img.shields.io/badge/FastAPI-009688?style=flat&logo=fastapi&logoColor=white" alt="FastAPI" /></a>
-<a href="https://www.python.org"><img src="https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white" alt="Python" /></a>
-<a href="https://www.postgresql.org"><img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat&logo=postgresql&logoColor=white" alt="PostgreSQL" /></a>
-<a href="https://redis.io"><img src="https://img.shields.io/badge/Redis-DC382D?style=flat&logo=redis&logoColor=white" alt="Redis" /></a>
-<a href="https://www.docker.com"><img src="https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white" alt="Docker" /></a>
-<a href="https://stripe.com"><img src="https://img.shields.io/badge/Stripe-635BFF?style=flat&logo=stripe&logoColor=white" alt="Stripe" /></a>
-<a href="https://ai.google.dev"><img src="https://img.shields.io/badge/Gemini-8E75B2?style=flat&logo=googlegemini&logoColor=white" alt="Gemini" /></a>
-<a href="https://www.llamaindex.ai"><img src="https://img.shields.io/badge/LlamaIndex-000?style=flat&logoColor=white" alt="LlamaIndex" /></a>
-<a href="https://aws.amazon.com/s3"><img src="https://img.shields.io/badge/AWS_S3-569A31?style=flat&logo=data:image/svg%2Bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0id2hpdGUiPjxwYXRoIGQ9Ik0xMiAyTDIgN3YxMGwxMCA1IDEwLTVWN0wxMiAyem0wIDIuMThMMTkuMTggNyAxMiA5LjgyIDQuODIgNyAxMiA0LjE4ek00IDguNjRsNyAzLjVWMTkuNWwtNy0zLjVWOC42NHptMTAgMTAuODZWMTIuMTRsNy0zLjV2Ny4zNmwtNyAzLjV6Ii8+PC9zdmc+&logoColor=white" alt="AWS S3" /></a>
-<a href="https://www.tinybird.co"><img src="https://img.shields.io/badge/Tinybird-1A1A1A?style=flat&logoColor=white" alt="Tinybird" /></a>
-</p>
+目标：先做出一套能真实服务用户的最小闭环。
 
-## 📁 Project Structure
+优先保留：
 
-| App | Path | Description | Technology | Used by |
-|-----|------|-------------|------------|---------|
-| **Web** | `apps/web` | Frontend application — dashboard, course player, editor, landing pages | Next.js, React, TailwindCSS, Tiptap | Teachers, Students, Admins |
-| **API** | `apps/api` | Backend REST API — auth, courses, payments, AI, analytics | FastAPI, Python, SQLModel, Alembic | Web, CLI, Collab |
-| **Collab** | `apps/collab` | Real-time collaboration server — live editing sync for courses & boards | Hocuspocus, Yjs, WebSocket | Web (editor, boards) |
-| **CLI** | `apps/cli` | Official CLI — setup wizard, dev environment, instance management | Commander, Node.js | Developers, Self-hosters |
+- 登录注册
+- 管理后台
+- 课程 / 章节 / 课时
+- 内容发布与学习页
+- 学习进度
+- 基础组织配置
+- 文件上传
 
-## 💬 Community
+明确延后：
 
-- [Discord](https://discord.gg/CMyZjjYZ6x) — chat with the team and other users
-- [Documentation](https://docs.learnhouse.app) — guides and references
+- 实时协作
+- 白板
+- AI 功能
+- 播客
+- 支付
+- SSO
+- 多组织
+- 高级分析
 
-## 🤝 Contributing
+这一阶段最适合做成“单组织、单站点、单后台”的产品，先把“老师发内容、学生看内容”跑通。
 
-```bash
-git clone https://github.com/learnhouse/learnhouse.git
-cd learnhouse
-npx learnhouse dev
-```
+### 第二阶段：经营能力与留存能力
 
-- [Contributing Guide](CONTRIBUTING.md)
-- [Submit a bug](https://github.com/learnhouse/learnhouse/issues/new?assignees=&labels=bug%2Ctriage&projects=&template=bug.yml&title=%5BBug%5D%3A+)
-- [Good first issues](https://github.com/learnhouse/learnhouse/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
+目标：在跑通教学闭环之后，补足增长和运营能力。
 
-## 🔒 Security
+建议加入：
 
-We take the security of LearnHouse and the data entrusted to us seriously. If you discover a vulnerability, please email **security@learnhouse.app** — do not disclose it publicly until we've had a chance to investigate.
+- 用户组 / 班级 / 权限分层
+- 课程合集 / 学习路径
+- 讨论区或评论
+- 邮件通知
+- 基础数据看板
+- 证书或学习完成证明
+- 可选的支付接入
 
-Please include a clear description, steps to reproduce, affected endpoints, and any relevant screenshots or proof-of-concept code. We will acknowledge your report, keep you informed, and credit you once resolved if you wish.
+这一阶段重点不是继续堆功能，而是让产品开始具备“可运营、可转化、可复购”的能力。
 
-See our full [Security Policy](https://learnhouse.app/security) for details on our practices, scope, and responsible disclosure guidelines.
+### 第三阶段：平台化与高复杂功能
 
-## ✍️ Author & Maintainer
+目标：只有在前两阶段验证过用户需求后，再引入高投入模块。
 
-Sweave (Badr B.) — [@swve](https://github.com/swve)
+可放到这一阶段的能力：
 
-## 💜 A Word
+- 实时协作文档
+- 协作白板
+- AI 助教 / AI 内容生成
+- 高级搜索与智能推荐
+- 多组织 / 多租户
+- 企业版能力
+- SSO / SCORM / 更强分析链路
 
-LearnHouse is made with 💜, from the UI to the features it is carefully designed to make students and teachers lives easier and make education software more enjoyable.
+这一阶段本质上是在做平台升级，而不是 MVP。没有真实业务验证前，不建议过早投入。
 
-Thank you and have fun using/developing/testing LearnHouse !
+## 本地运行可行性
 
-## 📄 License
+如果直接跑当前上游这套代码，本地可行，但前提是你接受它已经是“平台级工程”：
 
-[AGPL-3.0](LICENSE) — Enterprise features are available under a separate Enterprise License.
+- 前端：Next.js 16 + React 19
+- 后端：FastAPI + Python 3.14.3
+- 实时层：Hocuspocus / Yjs
+- 基础依赖：PostgreSQL + Redis
+- 开发方式：CLI 会帮你拉起 Docker 里的 DB 和 Redis
+
+从当前仓库实现看，本地开发至少要准备：
+
+- Node.js 18+
+- Bun
+- Python 3.14.3
+- Docker Desktop
+
+结论：
+
+- 第一阶段目标在你本地机器上非常可行
+- 第二阶段仍然可行，但会开始明显吃环境稳定性和外部服务配置
+- 第三阶段本地也能开发，但调试成本、资源占用和故障复杂度会明显上升
+
+## 服务器建议
+
+| 阶段 | 推荐形态 | 建议配置 | 说明 |
+| --- | --- | --- | --- |
+| 第一阶段 | 单机或单容器组 | 2 vCPU / 4-8GB RAM / 40GB SSD | Web + API + PostgreSQL 可先放一起，适合验证 |
+| 第二阶段 | 应用与数据分离 | 4 vCPU / 8-16GB RAM / 80GB SSD | 建议把 PostgreSQL、Redis、对象存储、邮件服务独立出去 |
+| 第三阶段 | 分层部署 | 8+ vCPU / 16-32GB RAM | 需要单独考虑协作服务、AI、监控、缓存、存储、CDN |
+
+更细的阶段目标、裁剪策略和基础设施建议，见：
+
+- [docs/plans/2026-04-23-leolearnhouse-three-phase-plan.md](docs/plans/2026-04-23-leolearnhouse-three-phase-plan.md)
+
+## 当前建议
+
+如果你要把它做成自己的项目，我建议我们按下面的顺序推进：
+
+1. 先冻结“第一阶段功能边界”，不要继续照抄上游全部特性
+2. 在当前代码上识别哪些模块可以直接复用，哪些模块应该删除或绕开
+3. 先把本地开发链路跑通，只验证第一阶段依赖
+4. 再开始做品牌替换、信息架构调整、数据模型裁剪和页面重构
+
+## 致谢
+
+本仓库研究与二次开发工作基于上游项目 [learnhouse/learnhouse](https://github.com/learnhouse/learnhouse)。感谢原作者和贡献者提供优秀的开源基础。
